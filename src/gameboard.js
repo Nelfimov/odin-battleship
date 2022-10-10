@@ -3,7 +3,7 @@ import { Ship } from "./ship.js";
 export const GameBoard = () => {
   const BOARD = new Map();
 
-  const placeShip = (arrayStart, arrayEnd, length, board = BOARD) => {
+  const placeShip = (arrayStart, arrayEnd, length, board = getBoard()) => {
     if (!checkCoordinates(arrayStart, arrayEnd, length)) {
       return 'This is wrong coordinates or length';
     };
@@ -11,21 +11,24 @@ export const GameBoard = () => {
     [arrayStart, arrayEnd] = swapCoordinates(arrayStart, arrayEnd);
 
     const newShip = Ship(length);
-    if (arrayStart[0] !== arrayEnd[0]) {
-      while (arrayStart[0] <= arrayEnd[0]) {
-        board.set([arrayStart[0], arrayStart[1]], newShip);
-        ++arrayStart[0];
-      };
+    const path = iterateThroughCoordinates(arrayStart, arrayEnd);
+    board.set(newShip, []);
+    path.forEach((element) => board.get(newShip).push(element));
 
-    } else {
-      while (arrayStart[1] <= arrayEnd[1]) {
-        board.set([arrayStart[0], arrayStart[1]], newShip);
-        ++arrayStart[1];
-      };
+    return newShip;
+  };
 
-    };
+  const iterateThroughCoordinates = (start, end, array = []) => {
+    array.push(start);
 
-    return BOARD.get(arrayStart);
+    if (start.every((item, index) => item === end[index])) return array;
+
+    const newStart = start.map((item, index) => {
+      if (item < end[index]) return ++item;
+      return item;
+    });
+
+    return iterateThroughCoordinates(newStart, end, array);
   };
 
   const checkCoordinates = (start, end, length) => {
@@ -49,9 +52,70 @@ export const GameBoard = () => {
     return [start, end];
   };
 
-  const receiveAttack = (x, y) => {
+  const receiveAttack = (coordinates, board = getBoard()) => {
+    let message;
+    let status = false;
 
+    if (checkIfAlreadyHit(coordinates, board)) {
+      message = 'You missed!';
+      return { status, message, ship: null };
+    };
+
+    let hittedShip;
+
+    outer: for (let key of board.keys()) {
+
+      for (let value of board.get(key)) {
+
+        if (value.every((item, index) => item == coordinates[index])) {
+          hittedShip = key;
+          status = true;
+          message = 'GOTCHA';
+          hittedShip.hit();
+          board.get(null).push(coordinates);
+          break outer;
+        };
+
+      };
+
+    };
+
+    return { status, message, ship: hittedShip };
   };
 
-  return { receiveAttack, placeShip, checkCoordinates };
+  const checkIfAlreadyHit = (coordinates, board = getBoard()) => {
+    if (!board.get(null)) return false;
+    for (let value of board.get(null)) {
+      if (value.every((item, index) => item === coordinates[index])) {
+        return true;
+      };
+    };
+  };
+
+  const getShipsLeft = (board = getBoard()) => {
+    const shipsLeft = new Map();
+    let status = false;
+    let message = 'There are no ships left';
+
+    for (let ship of board.keys()) {
+      if (!ship) continue;
+
+      if (!ship.isSunk()) {
+        shipsLeft.set(ship, board.get(ship));
+        message = 'Some ships are still there';
+        status = true;
+      };
+
+    };
+
+    return { status, message, shipsLeft };
+  };
+
+  const getBoard = () => {
+    const hits = BOARD.get(null);
+    if (!hits) BOARD.set(null, []);
+    return BOARD
+  };
+
+  return { receiveAttack, placeShip, checkCoordinates, iterateThroughCoordinates, getBoard, getShipsLeft };
 };
