@@ -33,7 +33,7 @@ module.exports = {
         type: 'asset/resource',
       },
       {
-        test: /font\*\.(woff|woff2|eot|ttf|otf)$/i,
+        test: /\.(woff|woff2|eot|ttf|otf)$/i,
         type: 'asset/resource',
       },
     ],

@@ -1,4 +1,4 @@
-import { Ship } from "./ship.js";
+import {Ship} from './ship.js';
 
 export const GameBoard = () => {
   const BOARD = new Map();
@@ -10,6 +10,7 @@ export const GameBoard = () => {
 
     [arrayStart, arrayEnd] = swapCoordinates(arrayStart, arrayEnd);
 
+    // eslint-disable-next-line new-cap
     const newShip = Ship(length);
     const path = iterateThroughCoordinates(arrayStart, arrayEnd);
     board.set(newShip, []);
@@ -32,20 +33,22 @@ export const GameBoard = () => {
   };
 
   const checkCoordinates = (start, end, length) => {
-    if (Math.abs(start[0] - end[0]) === (length - 1) && start[1] - end[1] === 0
-      || Math.abs(start[1] - end[1]) === (length - 1) && start[0] - end[0] === 0) return true;
+    if (Math.abs(start[0] - end[0]) === (length - 1) &&
+    start[1] - end[1] === 0 ||
+      Math.abs(start[1] - end[1]) === (length - 1) &&
+       start[0] - end[0] === 0) return true;
 
     return false;
   };
 
   const swapCoordinates = (start, end) => {
     if (start[0] > end[0]) {
-      let temp = start[0];
+      const temp = start[0];
       start[0] = end[0];
       end[0] = temp;
     };
     if (start[1] > start[1]) {
-      let temp = start[1];
+      const temp = start[1];
       start[1] = end[1];
       end[1] = temp;
     };
@@ -58,15 +61,13 @@ export const GameBoard = () => {
 
     if (checkIfAlreadyHit(coordinates, board)) {
       message = 'You missed!';
-      return { status, message, ship: null };
+      return {status, message, ship: null};
     };
-
+    Ship;
     let hittedShip;
 
-    outer: for (let key of board.keys()) {
-
-      for (let value of board.get(key)) {
-
+    outer: for (const key of board.keys()) {
+      for (const value of board.get(key)) {
         if (value.every((item, index) => item == coordinates[index])) {
           hittedShip = key;
           status = true;
@@ -75,17 +76,15 @@ export const GameBoard = () => {
           board.get(null).push(coordinates);
           break outer;
         };
-
       };
-
     };
 
-    return { status, message, ship: hittedShip };
+    return {status, message, ship: hittedShip};
   };
 
   const checkIfAlreadyHit = (coordinates, board = getBoard()) => {
     if (!board.get(null)) return false;
-    for (let value of board.get(null)) {
+    for (const value of board.get(null)) {
       if (value.every((item, index) => item === coordinates[index])) {
         return true;
       };
@@ -97,7 +96,7 @@ export const GameBoard = () => {
     let status = false;
     let message = 'There are no ships left';
 
-    for (let ship of board.keys()) {
+    for (const ship of board.keys()) {
       if (!ship) continue;
 
       if (!ship.isSunk()) {
@@ -105,17 +104,17 @@ export const GameBoard = () => {
         message = 'Some ships are still there';
         status = true;
       };
-
     };
 
-    return { status, message, shipsLeft };
+    return {status, message, shipsLeft};
   };
 
   const getBoard = () => {
     const hits = BOARD.get(null);
     if (!hits) BOARD.set(null, []);
-    return BOARD
+    return BOARD;
   };
 
-  return { receiveAttack, placeShip, checkCoordinates, iterateThroughCoordinates, getBoard, getShipsLeft };
+  return {receiveAttack, placeShip, checkCoordinates,
+    iterateThroughCoordinates, getBoard, getShipsLeft};
 };
