@@ -25,7 +25,6 @@ const Game = () => {
   let opponentGameBoard = GameBoard();
 
   let player;
-
   const ai = Player('ai', false);
   ai.switchTurn();
 
@@ -67,7 +66,7 @@ const Game = () => {
   };
 
   const flow = () => {
-    getPlayer().switchTurn();
+    player.switchTurn();
     ai.switchTurn();
     if (!ai.getTurn()) return;
 
@@ -82,7 +81,7 @@ const Game = () => {
 
     DOMsetup.changeContentHeadline(`AI: ${result.message}`);
     if (!checkForWinner(playerGameBoard)) {
-      getPlayer().switchTurn();
+      player.switchTurn();
       ai.switchTurn();
     };
   };
