@@ -56,34 +56,34 @@ export const GameBoard = () => {
   };
 
   const receiveAttack = (coordinates, board = getBoard()) => {
-    let message;
+    let message = 'You missed!';
     let status = false;
 
     if (checkIfAlreadyHit(coordinates, board)) {
-      message = 'You missed!';
       return {status, message, ship: null};
     };
-    Ship;
-    let hittedShip;
+    let ship;
 
     outer: for (const key of board.keys()) {
+      if (key === null) continue;
       for (const value of board.get(key)) {
         if (value.every((item, index) => item == coordinates[index])) {
-          hittedShip = key;
+          ship = key;
           status = true;
           message = 'GOTCHA';
-          hittedShip.hit();
-          board.get(null).push(coordinates);
+          ship.hit();
           break outer;
         };
       };
     };
 
-    return {status, message, ship: hittedShip};
+    board.get(null).push(coordinates);
+    return {status, message, ship};
   };
 
   const checkIfAlreadyHit = (coordinates, board = getBoard()) => {
-    if (!board.get(null)) return false;
+    if (board.get(null) != undefined) return false;
+
     for (const value of board.get(null)) {
       if (value.every((item, index) => item === coordinates[index])) {
         return true;
@@ -118,3 +118,5 @@ export const GameBoard = () => {
   return {receiveAttack, placeShip, checkCoordinates,
     iterateThroughCoordinates, getBoard, getShipsLeft};
 };
+
+export default GameBoard;

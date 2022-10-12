@@ -1,24 +1,33 @@
 export const Player = (name, ai = false) => {
   let isTurn = true;
-  const moves = [];
-  if (ai) {
-    isTurn = false;
+
+  const getTurn = () => {
+    return isTurn;
+  };
+
+  const switchTurn = () => {
+    return getTurn() ? isTurn = false : isTurn = true;
+  };
+
+  const makeRandomMove = (array) => {
+    const x = Math.floor(Math.random() * 10 + 1);
+    const y = Math.floor(Math.random() * 10 + 1);
+
+    for (const item of array) {
+      if ([x, y].every((i, index) => i === item[index])) {
+        makeRandomMove(array);
+      };
+    };
+    return [x, y];
   };
 
   return {
     name,
     ai,
-    getTurn: function() {
-      return isTurn;
-    },
-    switchTrun: function() {
-      return getTurn() ? isTurn = false : isTurn = true;
-    },
-    getMoves: function() {
-      return moves;
-    },
-    addMove: function(coordinates) {
-      return moves.push(coordinates);
-    },
+    getTurn,
+    switchTurn,
+    makeRandomMove,
   };
 };
+
+export default Player;

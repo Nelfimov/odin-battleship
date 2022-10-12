@@ -1,5 +1,3 @@
-import hitMiss from '/src/assets/hit1.svg';
-import hitGot from '/src/assets/hit2.svg';
 import {injectGlobal, css} from '@emotion/css';
 import Roboto from '/src/assets/Roboto/Roboto-Regular.ttf';
 
@@ -24,10 +22,10 @@ export const DOMsetup = (() => {
   width: 10%;
 `;
 
-  const init = () => {
+  const init = (player) => {
     bodySetup();
     createHeader();
-    createContent();
+    createContent(player);
   };
 
   const bodySetup = () => {
@@ -74,7 +72,7 @@ export const DOMsetup = (() => {
     return span;
   };
 
-  const createContent = () => {
+  const createContent = (player) => {
     const div = document.createElement('div');
     const myStyle = css`
       display: grid;
@@ -83,15 +81,15 @@ export const DOMsetup = (() => {
       align-items: center;
     `;
     div.className = myStyle;
-    div.append(...createContentHeadlines());
+    div.append(...createContentHeadlines(player));
     div.append(createGameBoard('player'));
-    div.append(createGameBoard('ai'));
+    div.append(createGameBoard('opponent'));
 
     Body.appendChild(div);
     return div;
   };
 
-  const createContentHeadlines = () => {
+  const createContentHeadlines = (player) => {
     const h1 = document.createElement('h1');
     h1.setAttribute('style',
         'grid-column: 1 / 3; display: flex; justify-content: center;');
@@ -102,7 +100,7 @@ export const DOMsetup = (() => {
     h21.setAttribute('style',
         'display: flex; justify-content: center;');
     h21.id = 'subheadline-1';
-    h21.textContent = 'Player1';
+    h21.textContent = player.name;
 
     const h22 = document.createElement('h2');
     h22.setAttribute('style',
@@ -113,13 +111,8 @@ export const DOMsetup = (() => {
     return [h1, h21, h22];
   };
 
-  const changeContentHeadlines = (h1String, h2String) => {
-    if (h1String !== '') {
-      document.getElementById('main-h').textContent = h1String;
-    };
-    if (h2String !== '') {
-      document.getElementById('sub-h').textContent = h2String;
-    };
+  const changeContentHeadline = (string) => {
+    document.getElementById('main-h').textContent = string;
   };
 
   const createGameBoard = (player) => {
@@ -139,6 +132,7 @@ export const DOMsetup = (() => {
       justify-self: center;
     `;
     div.className = boardStyle;
+    div.setAttribute('player-data', player);
 
     let i = 1;
     let j = 1;
@@ -158,13 +152,6 @@ export const DOMsetup = (() => {
     const div = document.createElement('div');
     div.id = `${player}-${x}-${y}`;
     div.className = emtpyCellStyle;
-    if (player === 'ai') {
-      div.addEventListener('click', (e) => {
-        console.log(e.target.id.split('-'));
-        const icon = new Image();
-        // TODO: взять борд и запустить receiveAttack
-      });
-    }
     return div;
   };
 
@@ -176,15 +163,13 @@ export const DOMsetup = (() => {
       for (const coordinate of gameboard.getBoard().get(ship)) {
         const cell = document
             .getElementById(`player-${coordinate[0]}-${coordinate[1]}`);
-        cell.setAttribute('ship-data', ship);
+        cell.setAttribute('ship-hits-data', ship.getHits());
         cell.className = shipCellStyle;
       };
     }
   };
 
-  const makeMove = (coordinates) => {
-
-  };
-
-  return {init, makeMove, changeContentHeadlines, placeShips};
+  return {init, changeContentHeadline, placeShips};
 })();
+
+export default DOMsetup;
