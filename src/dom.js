@@ -22,10 +22,10 @@ export const DOMsetup = (() => {
   width: 10%;
 `;
 
-  const init = (player) => {
+  const init = () => {
     bodySetup();
     createHeader();
-    createContent(player);
+    createContent();
   };
 
   const bodySetup = () => {
@@ -33,6 +33,11 @@ export const DOMsetup = (() => {
       @font-face {
         font-family: 'Roboto';
         src: ${Roboto};
+      }
+
+      @keyframes animatehide {
+        from {opacity: 1}
+        to {opacity: 0}
       }
 
       body {
@@ -91,18 +96,18 @@ export const DOMsetup = (() => {
     return div;
   };
 
-  const createContentHeadlines = (player) => {
+  const createContentHeadlines = () => {
     const h1 = document.createElement('h1');
     h1.setAttribute('style',
         'grid-column: 1 / 3; display: flex; justify-content: center;');
     h1.id = 'main-h';
-    h1.textContent = 'Default';
+    h1.textContent = 'Start the game!';
 
     const h21 = document.createElement('h2');
     h21.setAttribute('style',
         'display: flex; justify-content: center;');
     h21.id = 'subheadline-1';
-    h21.textContent = player.name;
+    h21.textContent = '';
 
     const h22 = document.createElement('h2');
     h22.setAttribute('style',
@@ -201,7 +206,82 @@ export const DOMsetup = (() => {
     return button;
   };
 
-  return {init, changeContentHeadline, placeShips};
+  const createModal = () => {
+    const div = document.createElement('div');
+    const duration = 500;
+    const width = '300px';
+    const height = '30px';
+    const divStyle = css`
+      height: 100vh;
+      width: 100vw;
+      background-color: white;
+      position: fixed;
+      z-index: 1;
+      left: 0;
+      top: 0;
+      display: flex;
+      flex-flow: column wrap;
+      overflow: auto;
+      justify-content: center;
+      align-items: center;
+      opacity: 1;
+      transition: ${duration}ms;
+    `;
+    div.id = 'modal';
+    div.className = divStyle;
+
+    const headline = document.createElement('h1');
+    headline.textContent = 'Welcome to battleship game!';
+
+    const inputName = document.createElement('input');
+    const inputNameStyle = css`
+      // flex: 1 1 100%;
+      box-sizing: border-box;
+      height: ${height};
+      width: ${width};
+      margin-bottom: 20px;
+      border: 0.1px solid grey;
+      border-radius: 0.25em;
+      padding: 5px;
+      &:focus {
+        border: 2px solid hsl(220, 90%, 56%);
+        outline: none;
+      }
+    `;
+    inputName.id = 'input-name';
+    inputName.type = 'text';
+    inputName.placeholder = 'Enter your name';
+    inputName.className = inputNameStyle;
+
+    const buttonSubmit = document.createElement('button');
+    const buttonSubmitStyle = css`
+      box-sizing: content-box;
+      height: ${height};
+      width: ${width};
+      padding: 0;
+      color: white;
+      border-color: transparent;
+      background-color: hsl(220, 90%, 56%);
+      color: white;
+      border-radius: 0.25em;
+      box-shadow: 0 1px 4px hsla(220, 90%, 37%, 0.25);
+    `;
+    buttonSubmit.id = 'create-name';
+    buttonSubmit.type = 'button';
+    buttonSubmit.textContent = 'Submit';
+    buttonSubmit.className = buttonSubmitStyle;
+    buttonSubmit.addEventListener('click', () => {
+      div.style.opacity = '0';
+      setTimeout(() => div.style.display = 'none', duration);
+    });
+
+    div.append(headline, inputName, buttonSubmit);
+    Body.append(div);
+
+    return div;
+  };
+
+  return {init, changeContentHeadline, placeShips, createModal};
 })();
 
 export default DOMsetup;

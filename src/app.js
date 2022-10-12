@@ -24,16 +24,33 @@ const Game = () => {
   let playerGameBoard = GameBoard();
   let opponentGameBoard = GameBoard();
 
-  // const player = Player(prompt('Please enter your name'));
-  const player = Player('Jack');
+  let player;
+
   const ai = Player('ai', false);
   ai.switchTurn();
+
+  const createNewPlayer = () => {
+    player = Player(JSON.parse(localStorage.getItem('player-name')).name);
+    if (player) {
+      document.getElementById('subheadline-1').textContent = player.name;
+      return;
+    };
+
+    DOMsetup.createModal();
+    document.getElementById('create-name').addEventListener('click', () => {
+      const inputValue = document.getElementById('input-name').value;
+      player = Player(`${inputValue}`);
+      localStorage.setItem('player-name', JSON.stringify(player));
+      document.getElementById('subheadline-1').textContent = player.name;
+    });
+  };
 
   const createNewGame = () => {
     document.body.innerHTML = '';
     playerGameBoard = GameBoard();
     opponentGameBoard = GameBoard();
-    DOMsetup.init(player);
+    DOMsetup.init();
+    createNewPlayer();
     placeShips();
     addAttackEvents();
     document.getElementById('reset')
@@ -50,7 +67,7 @@ const Game = () => {
   };
 
   const flow = () => {
-    player.switchTurn();
+    getPlayer().switchTurn();
     ai.switchTurn();
     if (!ai.getTurn()) return;
 
@@ -65,7 +82,7 @@ const Game = () => {
 
     DOMsetup.changeContentHeadline(`AI: ${result.message}`);
     if (!checkForWinner(playerGameBoard)) {
-      player.switchTurn();
+      getPlayer().switchTurn();
       ai.switchTurn();
     };
   };
