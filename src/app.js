@@ -30,11 +30,14 @@ const Game = () => {
   ai.switchTurn();
 
   const createNewGame = () => {
+    document.body.innerHTML = '';
     playerGameBoard = GameBoard();
     opponentGameBoard = GameBoard();
     DOMsetup.init(player);
     placeShips();
     addAttackEvents();
+    document.getElementById('reset')
+        .addEventListener('click', () => createNewGame());
   };
 
   const placeShips = () => {

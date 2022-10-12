@@ -76,12 +76,14 @@ export const DOMsetup = (() => {
     const div = document.createElement('div');
     const myStyle = css`
       display: grid;
-      grid-template-rows: repeat(2, min-content) 1fr;
+      grid-template-rows: repeat(3, min-content) 1fr;
       grid-template-columns: repeat(2, 1fr);
-      align-items: center;
+      align-items: top;
     `;
     div.className = myStyle;
+    div.id = 'content';
     div.append(...createContentHeadlines(player));
+    div.append(resetButton());
     div.append(createGameBoard('player'));
     div.append(createGameBoard('opponent'));
 
@@ -167,6 +169,36 @@ export const DOMsetup = (() => {
         cell.className = shipCellStyle;
       };
     }
+  };
+
+  const resetButton = () => {
+    const button = document.createElement('button');
+    button.textContent = 'Reset';
+    button.type = 'button';
+    button.id = 'reset';
+    const myStyle = css`
+      width: 100px;
+      text-align: center;
+      height: 40px;
+      grid-column: 1 / 3;
+      display: flex;
+      align-self: center;
+      justify-self: center;
+      justify-content: center;
+      align-items: center;
+      border-color: transparent;
+      background-color: hsl(220, 90%, 56%);
+      color: white;
+      border-radius: 0.25em;
+      box-shadow: 0 1px 4px hsla(220, 90%, 37%, 0.25);
+      transition: 0.3s;
+      &:active {
+        transform: translateY(3px);
+      }
+    `;
+    button.className = myStyle;
+
+    return button;
   };
 
   return {init, changeContentHeadline, placeShips};
