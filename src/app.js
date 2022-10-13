@@ -6,12 +6,14 @@ import Player from '/src/player.js';
 import DOMsetup from '/src/dom.js';
 import {css} from '@emotion/css';
 
+
 const Game = () => {
   const imgMissStyle = css`
     display: block;
     margin-left: auto;
     margin-right: auto;
     width: 100%;
+    transition: width 0.3s;
   `;
   const imgHitStyle = css`
     display: block;
@@ -29,8 +31,9 @@ const Game = () => {
   ai.switchTurn();
 
   const createNewPlayer = () => {
-    player = Player(JSON.parse(localStorage.getItem('player-name')).name);
+    player = JSON.parse(localStorage.getItem('player-name'));
     if (player) {
+      player = Player(player);
       document.getElementById('subheadline-1').textContent = player.name;
       return;
     };
@@ -39,7 +42,7 @@ const Game = () => {
     document.getElementById('create-name').addEventListener('click', () => {
       const inputValue = document.getElementById('input-name').value;
       player = Player(`${inputValue}`);
-      localStorage.setItem('player-name', JSON.stringify(player));
+      localStorage.setItem('player-name', JSON.stringify(player.name));
       document.getElementById('subheadline-1').textContent = player.name;
     });
   };
@@ -57,11 +60,30 @@ const Game = () => {
   };
 
   const placeShips = () => {
-    playerGameBoard.placeShip([1, 1], [1, 3], 3);
-    playerGameBoard.placeShip([2, 5], [4, 5], 3);
+    for (let i = 2; i < 6; ++i) {
+      let start;
+      let end;
+      while (true) {
+        start = [Math.floor(Math.random() * 10 + 1),
+          Math.floor(Math.random() * 10 + 1)];
 
-    opponentGameBoard.placeShip([2, 2], [4, 2], 3);
-    opponentGameBoard.placeShip([1, 1], [3, 1], 3);
+        const coin = Math.random();
+
+        if (coin < 0.5) {
+          end = [start[0], Math.floor(Math.random() * 10 + 1)];
+        } else {
+          end = [Math.floor(Math.random() * 10 + 1), start[1]];
+        }
+
+        if (playerGameBoard.checkCoordinates(start, end, i)) {
+          break;
+        };
+      }
+      playerGameBoard.placeShip(start, end, i);
+    };
+
+    // opponentGameBoard.placeShip([2, 2], [4, 2], 3);
+    // opponentGameBoard.placeShip([1, 1], [3, 1], 3);
     return DOMsetup.placeShips(playerGameBoard);
   };
 
