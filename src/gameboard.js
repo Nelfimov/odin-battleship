@@ -1,58 +1,61 @@
+/* eslint-disable new-cap */
 import {Ship} from './ship.js';
 
 export const GameBoard = () => {
   const BOARD = new Map();
 
-  const placeShip = (arrayStart, arrayEnd, length, board = getBoard()) => {
-    if (!checkCoordinates(arrayStart, arrayEnd, length)) {
-      return 'This is wrong coordinates or length';
+  const placeShip = (start, isHorizontal, length, board = getBoard()) => {
+    const path = iterateThroughCoordinates(start, isHorizontal, length);
+
+    if (!checkShipForCollisions(path)) {
+      return {status: false, ship: null, message: 'Collision'};
     };
 
-    [arrayStart, arrayEnd] = swapCoordinates(arrayStart, arrayEnd);
-
-    // eslint-disable-next-line new-cap
     const newShip = Ship(length);
-    const path = iterateThroughCoordinates(arrayStart, arrayEnd);
-    board.set(newShip, []);
-    path.forEach((element) => board.get(newShip).push(element));
-
-    return newShip;
+    board.set(newShip, path);
+    return {status: true, ship: newShip, message: 'Ship places'};
   };
 
-  const iterateThroughCoordinates = (start, end, array = []) => {
+  const iterateThroughCoordinates = (start, isHorizontal, length) => {
+    const array = [];
     array.push(start);
 
-    if (start.every((item, index) => item === end[index])) return array;
+    let i = 1;
+    while (i < length) {
+      if (isHorizontal) {
+        array.push([start[0] + i, start[1]]);
+      } else {
+        array.push([start[0], start[1] + i]);
+      };
+      ++i;
+    };
 
-    const newStart = start.map((item, index) => {
-      if (item < end[index]) return ++item;
-      return item;
+    return array;
+  };
+
+  const checkShipForCollisions = (array, board = getBoard()) => {
+    let status = true;
+    array.forEach((item) => {
+      if (item[0] > 10 || item[1] > 10) {
+        status = false;
+        return;
+      };
     });
 
-    return iterateThroughCoordinates(newStart, end, array);
-  };
+    for (const shipTarget of array) {
+      for (const ship of board.keys()) {
+        if (!ship) continue;
 
-  const checkCoordinates = (start, end, length) => {
-    if (Math.abs(start[0] - end[0]) === (length - 1) &&
-    start[1] - end[1] === 0 ||
-      Math.abs(start[1] - end[1]) === (length - 1) &&
-       start[0] - end[0] === 0) return true;
-
-    return false;
-  };
-
-  const swapCoordinates = (start, end) => {
-    if (start[0] > end[0]) {
-      const temp = start[0];
-      start[0] = end[0];
-      end[0] = temp;
+        for (const coordinate of board.get(ship)) {
+          if (coordinate.every((item, index) => item === shipTarget[index])) {
+            status = false;
+            break;
+          };
+        };
+      };
     };
-    if (start[1] > start[1]) {
-      const temp = start[1];
-      start[1] = end[1];
-      end[1] = temp;
-    };
-    return [start, end];
+
+    return status;
   };
 
   const receiveAttack = (coordinates, board = getBoard()) => {
@@ -115,7 +118,7 @@ export const GameBoard = () => {
     return BOARD;
   };
 
-  return {receiveAttack, placeShip, checkCoordinates,
+  return {receiveAttack, placeShip, checkShipForCollisions,
     iterateThroughCoordinates, getBoard, getShipsLeft};
 };
 

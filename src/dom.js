@@ -146,7 +146,7 @@ export const DOMsetup = (() => {
     while (i < 11) {
       j = 1;
       while (j < 11) {
-        div.appendChild(createGameBoardField(i, j, player));
+        div.appendChild(createGameBoardField(j, i, player));
         ++j;
       };
       ++i;

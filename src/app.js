@@ -62,28 +62,29 @@ const Game = () => {
   const placeShips = () => {
     for (let i = 2; i < 6; ++i) {
       let start;
-      let end;
-      while (true) {
+      let isHorizontal;
+      const coin = Math.random();
+      if (coin < 0.5) {
+        isHorizontal = true;
+      } else {
+        isHorizontal = false;
+      };
+      inner: while (true) {
         start = [Math.floor(Math.random() * 10 + 1),
           Math.floor(Math.random() * 10 + 1)];
 
-        const coin = Math.random();
+        const path = opponentGameBoard
+            .iterateThroughCoordinates(start, isHorizontal, i);
 
-        if (coin < 0.5) {
-          end = [start[0], Math.floor(Math.random() * 10 + 1)];
-        } else {
-          end = [Math.floor(Math.random() * 10 + 1), start[1]];
-        }
-
-        if (playerGameBoard.checkCoordinates(start, end, i)) {
-          break;
+        if (opponentGameBoard.checkShipForCollisions(path)) {
+          break inner;
         };
-      }
-      playerGameBoard.placeShip(start, end, i);
+      };
+      opponentGameBoard.placeShip(start, isHorizontal, i);
     };
 
-    // opponentGameBoard.placeShip([2, 2], [4, 2], 3);
-    // opponentGameBoard.placeShip([1, 1], [3, 1], 3);
+    playerGameBoard.placeShip([2, 2], false, 3);
+    playerGameBoard.placeShip([1, 1], true, 3);
     return DOMsetup.placeShips(playerGameBoard);
   };
 
