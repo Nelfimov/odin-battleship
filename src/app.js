@@ -70,6 +70,7 @@ const Game = () => {
   };
 
   const placeShips = () => {
+    addPlaceEvents(5);
     for (let i = 2; i < 6; ++i) {
       let start;
       let isHorizontal;
@@ -93,10 +94,74 @@ const Game = () => {
       opponentGameBoard.placeShip(start, isHorizontal, i);
     };
 
-    playerGameBoard.placeShip([2, 2], false, 3);
-    playerGameBoard.placeShip([1, 1], true, 3);
     return DOMsetup.placeShips(playerGameBoard);
   };
+
+  const addPlaceEvents = (length) => {
+    let cells = document.querySelectorAll('div[player-data="player"]>div');
+    let oldCells;
+    let start;
+    let direction;
+    const placeShipHover = (e) => {
+      const [, x, y] = [...e.target.id.split('-')];
+      start = [x, y];
+      direction = document.getElementById('flip')
+          .getAttribute('flip-data');
+      if (direction === 'horizontal') {
+        direction = true;
+      } else {
+        direction = false;
+      }
+      const path = playerGameBoard
+          .iterateThroughCoordinates(
+              [x, y], direction, length);
+      const fits = playerGameBoard.checkShipForCollisions(path);
+      oldCells = DOMsetup.highlightShipPlacement(path, fits);
+    };
+
+    const placeShipNoHover = () => {
+      if (!oldCells) return;
+      const style = css`
+        background-color: white;
+        box-sizing: border-box;
+        border: 0.1px dotted grey;
+        height: 10%;
+        width: 10%;
+        &:hover {
+          border: 1px solid grey;
+          background-color: #e6e4df;
+        }
+      `;
+      oldCells.forEach((oldCell) => {
+        const tempCell = document
+            .getElementById(`player-${oldCell[0]}-${oldCell[1]}`);
+        if (!tempCell) return;
+        tempCell.className = style;
+      });
+      DOMsetup.placeShips(playerGameBoard);
+    };
+
+    const placeShipClick = () => {
+      const result = playerGameBoard.placeShip(start, direction, length);
+      if (result.status) DOMsetup.placeShips(playerGameBoard);
+
+      cells = document.querySelectorAll('div[player-data="player"]>div');
+
+      cells.forEach((cell) => {
+        cell.removeEventListener('mouseover', placeShipHover);
+        cell.removeEventListener('mouseout', placeShipNoHover);
+        cell.removeEventListener('click', placeShipClick);
+      });
+      if (length > 2) addPlaceEvents(length - 1);
+    };
+
+    cells.forEach((cell) => {
+      cell.addEventListener('mouseover', placeShipHover);
+      cell.addEventListener('mouseout', placeShipNoHover);
+      cell.addEventListener('click', placeShipClick);
+    });
+  };
+
 
   const flow = () => {
     player.switchTurn();

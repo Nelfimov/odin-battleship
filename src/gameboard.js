@@ -18,14 +18,16 @@ export const GameBoard = () => {
 
   const iterateThroughCoordinates = (start, isHorizontal, length) => {
     const array = [];
-    array.push(start);
+    array.push([parseInt(start[0]).toString(), parseInt(start[1]).toString()]);
 
     let i = 1;
     while (i < length) {
       if (isHorizontal) {
-        array.push([start[0] + i, start[1]]);
+        array.push([(parseInt(start[0]) + parseInt(i)).toString(),
+          parseInt(start[1]).toString()]);
       } else {
-        array.push([start[0], start[1] + i]);
+        array.push([parseInt(start[0]).toString(),
+          (parseInt(start[1]) + parseInt(i)).toString()]);
       };
       ++i;
     };
@@ -38,7 +40,6 @@ export const GameBoard = () => {
     array.forEach((item) => {
       if (item[0] > 10 || item[1] > 10) {
         status = false;
-        return;
       };
     });
 

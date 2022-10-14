@@ -1,26 +1,67 @@
+/* eslint-disable no-invalid-this */
 import {injectGlobal, css} from '@emotion/css';
 import Roboto from '/src/assets/Roboto/Roboto-Regular.ttf';
 
 export const DOMsetup = (() => {
   const Body = document.body;
   const emtpyCellStyle = css`
-  background-color: white;
-  box-sizing: border-box;
-  border: 0.1px dotted grey;
-  height: 10%;
-  width: 10%;
-  &:hover {
-    border: 1px solid grey;
-    background-color: #e6e4df;
-  }
-`;
+    background-color: white;
+    box-sizing: border-box;
+    border: 0.1px dotted grey;
+    height: 10%;
+    width: 10%;
+    &:hover {
+      border: 1px solid grey;
+      background-color: #e6e4df;
+    }
+  `;
   const shipCellStyle = css`
-  background-color: black;
-  box-sizing: border-box;
-  border: 0.1px dotted grey;
-  height: 10%;
-  width: 10%;
-`;
+    background-color: black;
+    box-sizing: border-box;
+    border: 0.1px dotted grey;
+    height: 10%;
+    width: 10%;
+  `;
+  const buttonStyle = css`
+    width: 100px;
+    text-align: center;
+    height: 40px;
+    display: flex;
+    align-self: center;
+    justify-self: center;
+    justify-content: center;
+    align-items: center;
+    border-color: transparent;
+    background-color: hsl(220, 90%, 56%);
+    color: white;
+    border-radius: 0.25em;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 4px hsla(220, 90%, 37%, 0.25);
+    transition: 0.3s;
+    &:active {
+      transform: translateY(3px);
+    }
+  `;
+  const buttonStyleFlip = css`
+    width: 100px;
+    text-align: center;
+    height: 40px;
+    display: flex;
+    align-self: center;
+    justify-self: center;
+    justify-content: center;
+    align-items: center;
+    border-color: transparent;
+    background-color: red;
+    color: white;
+    border-radius: 0.25em;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 4px hsla(220, 90%, 37%, 0.25);
+    transition: 0.3s;
+    &:active {
+      transform: translateY(3px);
+    }
+  `;
 
   const init = () => {
     bodySetup();
@@ -81,13 +122,14 @@ export const DOMsetup = (() => {
     const div = document.createElement('div');
     const myStyle = css`
       display: grid;
-      grid-template-rows: repeat(3, min-content) 1fr;
+      grid-template-rows: repeat(5, min-content);
       grid-template-columns: repeat(2, 1fr);
       align-items: top;
     `;
     div.className = myStyle;
     div.id = 'content';
     div.append(...createContentHeadlines(player));
+    div.append(flipButton());
     div.append(resetButton());
     div.append(createGameBoard('player'));
     div.append(createGameBoard('opponent'));
@@ -181,27 +223,33 @@ export const DOMsetup = (() => {
     button.textContent = 'Reset';
     button.type = 'button';
     button.id = 'reset';
-    const myStyle = css`
-      width: 100px;
-      text-align: center;
-      height: 40px;
-      grid-column: 1 / 3;
-      display: flex;
-      align-self: center;
-      justify-self: center;
-      justify-content: center;
-      align-items: center;
-      border-color: transparent;
-      background-color: hsl(220, 90%, 56%);
-      color: white;
-      border-radius: 0.25em;
-      box-shadow: 0 1px 4px hsla(220, 90%, 37%, 0.25);
-      transition: 0.3s;
-      &:active {
-        transform: translateY(3px);
-      }
-    `;
+    const myStyle = buttonStyle;
     button.className = myStyle;
+
+    return button;
+  };
+
+  const flipButton = () => {
+    const button = document.createElement('button');
+    button.textContent = 'Horizontal';
+    button.setAttribute('flip-data', 'horizontal');
+    button.type = 'button';
+    button.id = 'flip';
+    const myStyle = buttonStyle;
+    button.className = myStyle;
+
+    button.addEventListener('click', function() {
+      const lastText = this.textContent;
+      if (lastText === 'Horizontal') {
+        this.textContent = 'Vertical';
+        this.className = buttonStyleFlip;
+        this.setAttribute('flip-data', 'vertical');
+      } else {
+        this.textContent = 'Horizontal';
+        this.className = buttonStyle;
+        this.setAttribute('flip-data', 'horizontal');
+      }
+    });
 
     return button;
   };
@@ -287,7 +335,35 @@ export const DOMsetup = (() => {
     return div;
   };
 
-  return {init, changeContentHeadline, placeShips, createModal};
+  const highlightShipPlacement = (array, fits) => {
+    const fitStyle = css`
+      background-color: blue;
+      box-sizing: border-box;
+      border: 0.1px dotted grey;
+      height: 10%;
+      width: 10%;
+    `;
+    const noFitStyle = css`
+      background-color: red;
+      box-sizing: border-box;
+      border: 0.1px dotted grey;
+      height: 10%;
+      width: 10%;
+    `;
+    array.forEach((item) => {
+      const node = document.getElementById(`player-${item[0]}-${item[1]}`);
+      if (!node) return;
+      if (fits) {
+        node.className = fitStyle;
+      } else {
+        node.className = noFitStyle;
+      }
+    });
+    return array;
+  };
+
+  return {init, changeContentHeadline, placeShips, createModal,
+    highlightShipPlacement};
 })();
 
 export default DOMsetup;
