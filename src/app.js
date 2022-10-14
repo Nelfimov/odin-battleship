@@ -39,11 +39,21 @@ const Game = () => {
     };
 
     DOMsetup.createModal();
+
     document.getElementById('create-name').addEventListener('click', () => {
       const inputValue = document.getElementById('input-name').value;
       player = Player(`${inputValue}`);
       localStorage.setItem('player-name', JSON.stringify(player.name));
       document.getElementById('subheadline-1').textContent = player.name;
+    });
+
+    document.getElementById('input-name').addEventListener('keyup', (e) => {
+      if (e.key === 'Enter') {
+        const inputValue = document.getElementById('input-name').value;
+        player = Player(`${inputValue}`);
+        localStorage.setItem('player-name', JSON.stringify(player.name));
+        document.getElementById('subheadline-1').textContent = player.name;
+      };
     });
   };
 

@@ -252,6 +252,12 @@ export const DOMsetup = (() => {
     inputName.type = 'text';
     inputName.placeholder = 'Enter your name';
     inputName.className = inputNameStyle;
+    inputName.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        div.style.opacity = '0';
+        setTimeout(() => div.style.display = 'none', duration);
+      };
+    });
 
     const buttonSubmit = document.createElement('button');
     const buttonSubmitStyle = css`
