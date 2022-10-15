@@ -14,8 +14,8 @@ export const Player = (name, ai = false) => {
     const y = Math.floor(Math.random() * 10 + 1);
 
     for (const item of array) {
-      if ([x, y].every((i, index) => i === item[index])) {
-        makeRandomMove(array);
+      if ([x, y].every((i, index) => i == item[index])) {
+        return makeRandomMove(array);
       };
     };
     return [x, y];

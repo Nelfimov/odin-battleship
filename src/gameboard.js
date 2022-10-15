@@ -89,7 +89,7 @@ export const GameBoard = () => {
     if (board.get(null) != undefined) return false;
 
     for (const value of board.get(null)) {
-      if (value.every((item, index) => item === coordinates[index])) {
+      if (value.every((item, index) => item == coordinates[index])) {
         return true;
       };
     };
@@ -120,7 +120,7 @@ export const GameBoard = () => {
   };
 
   return {receiveAttack, placeShip, checkShipForCollisions,
-    iterateThroughCoordinates, getBoard, getShipsLeft};
+    iterateThroughCoordinates, getBoard, getShipsLeft, checkIfAlreadyHit};
 };
 
 export default GameBoard;

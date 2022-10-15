@@ -64,13 +64,17 @@ const Game = () => {
     DOMsetup.init();
     createNewPlayer();
     placeShips();
-    addAttackEvents();
     document.getElementById('reset')
         .addEventListener('click', () => createNewGame());
   };
 
   const placeShips = () => {
     addPlaceEvents(5);
+    placeShipsRandom();
+    return DOMsetup.placeShips(playerGameBoard);
+  };
+
+  const placeShipsRandom = () => {
     for (let i = 2; i < 6; ++i) {
       let start;
       let isHorizontal;
@@ -93,8 +97,6 @@ const Game = () => {
       };
       opponentGameBoard.placeShip(start, isHorizontal, i);
     };
-
-    return DOMsetup.placeShips(playerGameBoard);
   };
 
   const addPlaceEvents = (length) => {
@@ -143,7 +145,13 @@ const Game = () => {
 
     const placeShipClick = () => {
       const result = playerGameBoard.placeShip(start, direction, length);
-      if (result.status) DOMsetup.placeShips(playerGameBoard);
+      if (result.status) {
+        DOMsetup.placeShips(playerGameBoard);
+        DOMsetup.changeContentHeadline('Ship placed. Place another');
+      } else {
+        DOMsetup.changeContentHeadline('Cannot place ships here');
+        return;
+      }
 
       cells = document.querySelectorAll('div[player-data="player"]>div');
 
@@ -152,7 +160,12 @@ const Game = () => {
         cell.removeEventListener('mouseout', placeShipNoHover);
         cell.removeEventListener('click', placeShipClick);
       });
-      if (length > 2) addPlaceEvents(length - 1);
+      if (length > 2) {
+        return addPlaceEvents(length - 1);
+      } else {
+        DOMsetup.changeContentHeadline('FIGHT!');
+        return addAttackEvents();
+      };
     };
 
     cells.forEach((cell) => {
@@ -168,6 +181,10 @@ const Game = () => {
     ai.switchTurn();
     if (!ai.getTurn()) return;
 
+    document.querySelectorAll('div[player-data="opponent"]>div')
+        .forEach((cell) => {
+          cell.removeEventListener('click', clickAttack, {once: true});
+        });
     const coordinates = ai.makeRandomMove(playerGameBoard.getBoard().get(null));
 
     const result = attack(coordinates, playerGameBoard);
@@ -176,11 +193,11 @@ const Game = () => {
 
     attackDOMManipulation(result, cell);
 
-
     DOMsetup.changeContentHeadline(`AI: ${result.message}`);
     if (!checkForWinner(playerGameBoard)) {
       player.switchTurn();
       ai.switchTurn();
+      setTimeout(addAttackEvents, 1000);
     };
   };
 
@@ -189,23 +206,29 @@ const Game = () => {
         .querySelectorAll('div[player-data="opponent"]>div');
 
     opponentCells.forEach((item) => {
-      item.addEventListener('click', clickAttack, {once: true});
+      item.addEventListener('click', clickAttack, {once: true, capture: true});
     });
   };
 
   const clickAttack = (e) => {
-    const coordinates = e.target.id.split('-');
-    const result = attack([coordinates[1], coordinates[2]],
-        opponentGameBoard);
+    const [, x, y] = e.target.id.split('-');
+
+    if (!x || !y || opponentGameBoard.checkIfAlreadyHit([x, y]).status) {
+      DOMsetup.changeContentHeadline('You already hit here');
+      return;
+    };
+
+    const result = attack([x, y], opponentGameBoard);
     attackDOMManipulation(result, e.target);
-    if (!checkForWinner(opponentGameBoard)) flow();
+    if (!checkForWinner(opponentGameBoard)) {
+      setTimeout(flow, 1000);
+    };
   };
 
   const attack = (coordinates, board) => {
     const result = board.receiveAttack(coordinates);
     return result;
   };
-
 
   const checkForWinner = (board) => {
     if (!board.getShipsLeft().status) {

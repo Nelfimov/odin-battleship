@@ -143,7 +143,7 @@ export const DOMsetup = (() => {
     h1.setAttribute('style',
         'grid-column: 1 / 3; display: flex; justify-content: center;');
     h1.id = 'main-h';
-    h1.textContent = 'Start the game!';
+    h1.textContent = 'Game started. Place your ships!';
 
     const h21 = document.createElement('h2');
     h21.setAttribute('style',
