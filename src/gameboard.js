@@ -60,7 +60,7 @@ export const GameBoard = () => {
   };
 
   const receiveAttack = (coordinates, board = getBoard()) => {
-    let message = 'You missed!';
+    let message = 'missed!';
     let status = false;
 
     if (checkIfAlreadyHit(coordinates, board)) {
@@ -74,7 +74,7 @@ export const GameBoard = () => {
         if (value.every((item, index) => item == coordinates[index])) {
           ship = key;
           status = true;
-          message = 'GOTCHA';
+          message = 'that\'s a hit!';
           ship.hit();
           break outer;
         };

@@ -27,7 +27,7 @@ const Game = () => {
   let opponentGameBoard = GameBoard();
 
   let player;
-  const ai = Player('ai', false);
+  const ai = Player('AI', false);
   ai.switchTurn();
 
   const createNewPlayer = () => {
@@ -145,9 +145,14 @@ const Game = () => {
 
     const placeShipClick = () => {
       const result = playerGameBoard.placeShip(start, direction, length);
+
       if (result.status) {
         DOMsetup.placeShips(playerGameBoard);
-        DOMsetup.changeContentHeadline('Ship placed. Place another');
+        if (length > 2) {
+          DOMsetup.changeContentHeadline('Ship placed. Place another');
+        } else {
+          DOMsetup.changeContentHeadline('All ships placed. FIGHT!');
+        };
       } else {
         DOMsetup.changeContentHeadline('Cannot place ships here');
         return;
@@ -160,10 +165,10 @@ const Game = () => {
         cell.removeEventListener('mouseout', placeShipNoHover);
         cell.removeEventListener('click', placeShipClick);
       });
+
       if (length > 2) {
         return addPlaceEvents(length - 1);
       } else {
-        DOMsetup.changeContentHeadline('FIGHT!');
         return addAttackEvents();
       };
     };
@@ -191,9 +196,9 @@ const Game = () => {
     const cell = document
         .getElementById(`player-${coordinates[0]}-${coordinates[1]}`);
 
-    attackDOMManipulation(result, cell);
+    attackDOMManipulation(result, cell, ai.name);
 
-    DOMsetup.changeContentHeadline(`AI: ${result.message}`);
+    // DOMsetup.changeContentHeadline(`AI: ${result.message}`);
     if (!checkForWinner(playerGameBoard)) {
       player.switchTurn();
       ai.switchTurn();
@@ -219,7 +224,7 @@ const Game = () => {
     };
 
     const result = attack([x, y], opponentGameBoard);
-    attackDOMManipulation(result, e.target);
+    attackDOMManipulation(result, e.target, player.name);
     if (!checkForWinner(opponentGameBoard)) {
       setTimeout(flow, 1000);
     };
@@ -242,7 +247,7 @@ const Game = () => {
     return false;
   };
 
-  const attackDOMManipulation = (result, cell) => {
+  const attackDOMManipulation = (result, cell, name) => {
     const img = new Image();
     img.src = missIcon;
     result.status ? img.src = hitIcon: img.src = missIcon;
@@ -253,7 +258,7 @@ const Game = () => {
          img.className = imgMissStyle;
     };
     cell.append(img);
-    DOMsetup.changeContentHeadline(`Player: ${result.message}`);
+    DOMsetup.changeContentHeadline(`${name}: ${result.message}`);
   };
 
   return {createNewGame};

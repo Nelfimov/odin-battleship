@@ -161,7 +161,17 @@ export const DOMsetup = (() => {
   };
 
   const changeContentHeadline = (string) => {
-    document.getElementById('main-h').textContent = string;
+    document.getElementById('main-h').textContent = '';
+
+    const delay = 20;
+    let i = 0;
+    (function typing() {
+      if (i < string.length) {
+        document.getElementById('main-h').textContent += string.charAt(i);
+        ++i;
+        setTimeout(typing, delay);
+      };
+    })();
   };
 
   const createGameBoard = (player) => {
