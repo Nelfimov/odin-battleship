@@ -1,4 +1,6 @@
 /* eslint-disable no-invalid-this */
+import hitIcon from '/src/assets/hit1.svg';
+import missIcon from '/src/assets/hit2.svg';
 import {injectGlobal, css} from '@emotion/css';
 import Roboto from '/src/assets/Roboto/Roboto-Regular.ttf';
 

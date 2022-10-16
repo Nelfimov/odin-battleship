@@ -69,7 +69,9 @@ const Game = () => {
   };
 
   const placeShips = () => {
+    /* Placing players ships */
     addPlaceEvents(5);
+    /* Opponent random ships */
     placeShipsRandom();
     return DOMsetup.placeShips(playerGameBoard);
   };
@@ -99,6 +101,7 @@ const Game = () => {
     };
   };
 
+  /* Adding event listener to player gameboard for placing ships */
   const addPlaceEvents = (length) => {
     let cells = document.querySelectorAll('div[player-data="player"]>div');
     let oldCells;
@@ -180,7 +183,7 @@ const Game = () => {
     });
   };
 
-
+  /* Game flow */
   const flow = () => {
     player.switchTurn();
     ai.switchTurn();
@@ -198,7 +201,6 @@ const Game = () => {
 
     attackDOMManipulation(result, cell, ai.name);
 
-    // DOMsetup.changeContentHeadline(`AI: ${result.message}`);
     if (!checkForWinner(playerGameBoard)) {
       player.switchTurn();
       ai.switchTurn();
