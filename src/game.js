@@ -1,6 +1,4 @@
 /* eslint-disable new-cap */
-import hitIcon from '/src/assets/hit1.svg';
-import missIcon from '/src/assets/hit2.svg';
 import GameBoard from '/src/gameboard.js';
 import Player from '/src/player.js';
 import DOMsetup from '/src/dom.js';
@@ -8,21 +6,6 @@ import {css} from '@emotion/css';
 
 
 const Game = () => {
-  const imgMissStyle = css`
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-    width: 100%;
-    transition: width 0.3s;
-  `;
-  const imgHitStyle = css`
-    display: block;
-    filter: invert();
-    margin-left: auto;
-    margin-right: auto;
-    width: 100%;
-  `;
-
   let playerGameBoard = GameBoard();
   let opponentGameBoard = GameBoard();
 
@@ -38,23 +21,7 @@ const Game = () => {
       return;
     };
 
-    DOMsetup.createModal();
-
-    document.getElementById('create-name').addEventListener('click', () => {
-      const inputValue = document.getElementById('input-name').value;
-      player = Player(`${inputValue}`);
-      localStorage.setItem('player-name', JSON.stringify(player.name));
-      document.getElementById('subheadline-1').textContent = player.name;
-    });
-
-    document.getElementById('input-name').addEventListener('keyup', (e) => {
-      if (e.key === 'Enter') {
-        const inputValue = document.getElementById('input-name').value;
-        player = Player(`${inputValue}`);
-        localStorage.setItem('player-name', JSON.stringify(player.name));
-        document.getElementById('subheadline-1').textContent = player.name;
-      };
-    });
+    player = Player(DOMsetup.createModal());
   };
 
   const createNewGame = () => {
@@ -93,9 +60,7 @@ const Game = () => {
         const path = opponentGameBoard
             .iterateThroughCoordinates(start, isHorizontal, i);
 
-        if (opponentGameBoard.checkShipForCollisions(path)) {
-          break inner;
-        };
+        if (opponentGameBoard.checkShipForCollisions(path)) break inner;
       };
       opponentGameBoard.placeShip(start, isHorizontal, i);
     };
@@ -157,7 +122,7 @@ const Game = () => {
           DOMsetup.changeContentHeadline('All ships placed. FIGHT!');
         };
       } else {
-        DOMsetup.changeContentHeadline('Cannot place ships here');
+        DOMsetup.changeContentHeadline('Cannot place ship here');
         return;
       }
 
@@ -183,7 +148,9 @@ const Game = () => {
     });
   };
 
+
   /* Game flow */
+  let hitCell;
   const flow = () => {
     player.switchTurn();
     ai.switchTurn();
@@ -193,13 +160,26 @@ const Game = () => {
         .forEach((cell) => {
           cell.removeEventListener('click', clickAttack, {once: true});
         });
-    const coordinates = ai.makeRandomMove(playerGameBoard.getBoard().get(null));
+
+    let coordinates;
+    if (hitCell === undefined) {
+      coordinates = ai.makeRandomMove(
+          playerGameBoard.getBoard().get(null),
+      );
+    } else {
+      coordinates = ai.makeRandomMove(
+          playerGameBoard.getBoard().get(null), true, hitCell,
+      );
+    };
 
     const result = attack(coordinates, playerGameBoard);
+    if (result.status) {
+      hitCell = coordinates;
+    };
     const cell = document
         .getElementById(`player-${coordinates[0]}-${coordinates[1]}`);
 
-    attackDOMManipulation(result, cell, ai.name);
+    DOMsetup.attackDOMManipulation(result, cell, ai.name);
 
     if (!checkForWinner(playerGameBoard)) {
       player.switchTurn();
@@ -226,7 +206,7 @@ const Game = () => {
     };
 
     const result = attack([x, y], opponentGameBoard);
-    attackDOMManipulation(result, e.target, player.name);
+    DOMsetup.attackDOMManipulation(result, e.target, player.name);
     if (!checkForWinner(opponentGameBoard)) {
       setTimeout(flow, 1000);
     };
@@ -247,20 +227,6 @@ const Game = () => {
       return true;
     };
     return false;
-  };
-
-  const attackDOMManipulation = (result, cell, name) => {
-    const img = new Image();
-    img.src = missIcon;
-    result.status ? img.src = hitIcon: img.src = missIcon;
-    if (cell.id.split('-')[0] === 'opponent') {
-      img.className = imgMissStyle;
-    } else {
-      result.status ? img.className = imgHitStyle :
-         img.className = imgMissStyle;
-    };
-    cell.append(img);
-    DOMsetup.changeContentHeadline(`${name}: ${result.message}`);
   };
 
   return {createNewGame};

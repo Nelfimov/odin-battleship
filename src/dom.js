@@ -64,6 +64,20 @@ export const DOMsetup = (() => {
       transform: translateY(3px);
     }
   `;
+  const imgMissStyle = css`
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+    transition: width 0.3s;
+  `;
+  const imgHitStyle = css`
+    display: block;
+    filter: invert();
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+  `;
 
   const init = () => {
     bodySetup();
@@ -344,7 +358,25 @@ export const DOMsetup = (() => {
     div.append(headline, inputName, buttonSubmit);
     Body.append(div);
 
-    return div;
+    let name = '';
+
+    buttonSubmit.addEventListener('click', () => {
+      const inputValue = document.getElementById('input-name').value;
+      localStorage.setItem('player-name', JSON.stringify(inputValue));
+      document.getElementById('subheadline-1').textContent = inputValue;
+      return name = inputValue;
+    });
+
+    inputName.addEventListener('keyup', (e) => {
+      if (e.key === 'Enter') {
+        const inputValue = document.getElementById('input-name').value;
+        localStorage.setItem('player-name', JSON.stringify(inputValue));
+        document.getElementById('subheadline-1').textContent = inputValue;
+        return name = inputValue;
+      };
+    });
+
+    return name;
   };
 
   const highlightShipPlacement = (array, fits) => {
@@ -374,8 +406,22 @@ export const DOMsetup = (() => {
     return array;
   };
 
+  const attackDOMManipulation = (result, cell, name) => {
+    const img = new Image();
+    img.src = missIcon;
+    result.status ? img.src = hitIcon: img.src = missIcon;
+    if (cell.id.split('-')[0] === 'opponent') {
+      img.className = imgMissStyle;
+    } else {
+      result.status ? img.className = imgHitStyle :
+         img.className = imgMissStyle;
+    };
+    cell.append(img);
+    changeContentHeadline(`${name}: ${result.message}`);
+  };
+
   return {init, changeContentHeadline, placeShips, createModal,
-    highlightShipPlacement};
+    highlightShipPlacement, attackDOMManipulation};
 })();
 
 export default DOMsetup;

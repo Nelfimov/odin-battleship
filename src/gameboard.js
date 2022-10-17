@@ -63,9 +63,9 @@ export const GameBoard = () => {
     let message = 'missed!';
     let status = false;
 
-    if (checkIfAlreadyHit(coordinates, board)) {
-      return {status, message, ship: null};
-    };
+    // if (checkIfAlreadyHit(coordinates, board)) {
+    // return {status, message, ship: null};
+    // };
     let ship;
 
     outer: for (const key of board.keys()) {
