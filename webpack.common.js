@@ -1,13 +1,8 @@
-let mode = 'development';
-if (process.env.NODE_ENV === 'production') mode = 'production';
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const path = require('path');
 
-console.log(`Mode: ${mode}`);
-
 module.exports = {
-  mode: mode,
   entry: './src/index.js',
   output: {
     filename: 'main.js',
@@ -17,10 +12,10 @@ module.exports = {
   plugins: [
     new MiniCssExtractPlugin(),
     new HtmlWebpackPlugin({
-      template: './src/index.html'
+      template: './src/index.html',
+      title: 'Production',
     }),
   ],
-  devtool: 'inline-source-map',
   module: {
     rules: [
       {
@@ -37,5 +32,5 @@ module.exports = {
         type: 'asset/resource',
       },
     ],
-  }
-}
+  },
+};

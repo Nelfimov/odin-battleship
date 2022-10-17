@@ -156,11 +156,6 @@ const Game = () => {
     ai.switchTurn();
     if (!ai.getTurn()) return;
 
-    document.querySelectorAll('div[player-data="opponent"]>div')
-        .forEach((cell) => {
-          cell.removeEventListener('click', clickAttack, {once: true});
-        });
-
     let coordinates;
     if (hitCell === undefined) {
       coordinates = ai.makeRandomMove(
@@ -184,7 +179,7 @@ const Game = () => {
     if (!checkForWinner(playerGameBoard)) {
       player.switchTurn();
       ai.switchTurn();
-      setTimeout(addAttackEvents, 1000);
+      addAttackEvents();
     };
   };
 
@@ -207,6 +202,14 @@ const Game = () => {
 
     const result = attack([x, y], opponentGameBoard);
     DOMsetup.attackDOMManipulation(result, e.target, player.name);
+
+    document.querySelectorAll('div[player-data="opponent"]>div')
+        .forEach((cell) => {
+          cell.removeEventListener(
+              'click', clickAttack, {once: true, capture: true},
+          );
+        });
+
     if (!checkForWinner(opponentGameBoard)) {
       setTimeout(flow, 1000);
     };
